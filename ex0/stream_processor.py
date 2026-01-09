@@ -72,50 +72,49 @@ class LogProcessor(DataProcessor):
 
 
 def main() -> None:
-    """Main function to demonstrate data processors."""
-    print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
+    print("=== CODE NEXUS DATA PROCESSOR FOUNDATION ===")
     print()
 
-    # Numeric Processor
+    # Create processors once
     numeric = NumericProcessor()
-    data = [1, 2, 3, 4, 5]
-    print("Initializing Numeric Processor...")
-    print(f"Processing data: {data}")
-    print("Validation: Numeric data verified")
-    print(numeric.format_output(numeric.process(data)))
-    print()
-
-    # Text Processor
     text = TextProcessor()
-    data = "Hello Nexus World"
-    print("Initializing Text Processor...")
-    print(f"Processing data: \"{data}\"")
-    print("Validation: Text data verified")
-    print(text.format_output(text.process(data)))
-    print()
-
-    # Log Processor
     log = LogProcessor()
-    data = "ERROR: Connection timeout"
-    print("Initializing Log Processor...")
-    print(f"Processing data: \"{data}\"")
-    print("Validation: Log entry verified")
-    print(log.format_output(log.process(data)))
-    print()
+
+    processors: List[DataProcessor] = [numeric, text, log]
+
+    data_samples: List[Any] = [
+        [1, 2, 3, 4, 5],
+        "Hello Nexus World",
+        "ERROR: Connection timeout"
+    ]
+
+    # Scripted demo (one processor – one matching data)
+    for processor, data in zip(processors, data_samples):
+        name = processor.__class__.__name__.replace("Processor", " Processor")
+
+        print(f"Initializing {name}...")
+        print(f"Processing data: {data!r}")
+        print(f"Validation: {name.split()[0]} data verified")
+
+        result = processor.process(data)
+        print(processor.format_output(result))
+        print()
 
     # Polymorphic demo
     print("=== Polymorphic Processing Demo ===")
     print("Processing multiple data types through same interface...")
 
-    processors: List[DataProcessor] = [numeric, text, log]
-    samples = [
+    mixed_samples: List[Any] = [
         [1, 2, 3],
         "Hello Nexus",
         "INFO: System ready",
     ]
 
-    for i, (proc, sample) in enumerate(zip(processors, samples), start=1):
-        result = proc.process(sample)
+    for i, (processor, sample) in enumerate(
+        zip(processors, mixed_samples),
+        start=1
+    ):
+        result = processor.process(sample)
         print(f"Result {i}: {result}")
     print()
 
