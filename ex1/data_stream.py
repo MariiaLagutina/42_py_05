@@ -305,6 +305,10 @@ def main() -> None:
 
     print("\nAll streams processed successfully. Nexus throughput optimal.")
 
+    # print("\n=== Stream Statistics ===")
+    # for stream in processor.streams:
+    #     print(stream.get_stats())
+
 
 if __name__ == "__main__":
     main()

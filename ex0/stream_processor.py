@@ -9,16 +9,18 @@ class DataProcessor(ABC):
     @abstractmethod
     def validate(self, data: Any) -> bool:
         """Validate the input data."""
-        pass
 
     @abstractmethod
     def process(self, data: Any) -> str:
         """Process the input data and return a result string."""
-        pass
 
     def format_output(self, result: str) -> str:
         """Format the output result."""
         return f"Output: {result}"
+
+    def validation_message(self) -> str:
+        """Return a standard validation message."""
+        return "data verified"
 
 
 class NumericProcessor(DataProcessor):
@@ -38,6 +40,9 @@ class NumericProcessor(DataProcessor):
         avg = total / count
         return f"Processed {count} numeric values, sum={total}, avg={avg}"
 
+    def validation_message(self) -> str:
+        return "Numeric data verified"
+
 
 class TextProcessor(DataProcessor):
     """Processor for text data."""
@@ -50,6 +55,9 @@ class TextProcessor(DataProcessor):
         chars = len(data)
         words = len(data.split())
         return f"Processed text: {chars} characters, {words} words"
+
+    def validation_message(self) -> str:
+        return "Text data verified"
 
 
 class LogProcessor(DataProcessor):
@@ -70,9 +78,12 @@ class LogProcessor(DataProcessor):
         label = "ALERT" if level == "ERROR" else "INFO"
         return f"[{label}] {level} level detected: {message}"
 
+    def validation_message(self) -> str:
+        return "Log entry verified"
+
 
 def main() -> None:
-    print("=== CODE NEXUS DATA PROCESSOR FOUNDATION ===")
+    print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
     print()
 
     # Create processors once
@@ -94,10 +105,18 @@ def main() -> None:
 
         print(f"Initializing {name}...")
         print(f"Processing data: {data!r}")
-        print(f"Validation: {name.split()[0]} data verified")
 
-        result = processor.process(data)
-        print(processor.format_output(result))
+        try:
+            if not processor.validate(data):
+                raise ValueError("Invalid data for processor")
+
+            print(f"Validation: {processor.validation_message()}")
+            result = processor.process(data)
+            print(processor.format_output(result))
+
+        except ValueError as error:
+            print(f"Validation error: {error}")
+
         print()
 
     # Polymorphic demo
