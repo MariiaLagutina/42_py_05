@@ -1,37 +1,14 @@
 #!/usr/bin/env python3
 
 from abc import ABC
-from typing import Any, List, Union, Protocol
+from typing import Any, List, Union, Protocol, runtime_checkable
+from typing import Iterable, Tuple
 import time
 import io
 from contextlib import redirect_stdout
 
 
-def run_pipeline_chain(pipelines, records):
-    """Run a chain of processing pipelines on a stream of records."""
-    start = time.perf_counter()
-    processed = 0
-
-    for record in records:
-        data = record
-        for pipeline in pipelines:
-            data = pipeline.process(data)
-        processed += 1
-
-    duration = time.perf_counter() - start
-    return processed, duration
-
-
-def record_stream(count: int):
-    """Simulate a stream of sensor data records."""
-    for i in range(count):
-        yield {
-            "sensor": "temp",
-            "value": 20 + (i % 5),
-            "unit": "C"
-        }
-
-
+@runtime_checkable
 class ProcessingStage(Protocol):
     """Protocol for processing stages in the pipeline."""
     def process(self, data: Any) -> Any:
@@ -228,6 +205,32 @@ class NexusManager:
 
 
 def nexus() -> None:
+    def run_pipeline_chain(
+        pipelines: List[ProcessingPipeline],
+        records: Iterable[Any]
+    ) -> Tuple[int, float]:
+        """Run a chain of processing pipelines on a stream of records."""
+        start = time.perf_counter()
+        processed = 0
+
+        for record in records:
+            data = record
+            for pipeline in pipelines:
+                data = pipeline.process(data)
+            processed += 1
+
+        duration = time.perf_counter() - start
+        return processed, duration
+
+    def record_stream(count: int):
+        """Simulate a stream of sensor data records."""
+        for i in range(count):
+            yield {
+                "sensor": "temp",
+                "value": 20 + (i % 5),
+                "unit": "C"
+            }
+
     print("=== CODE NEXUS - ENTERPRISE PIPELINE SYSTEM ===")
     print()
 
